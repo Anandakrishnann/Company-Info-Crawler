@@ -203,6 +203,47 @@ def extract_address(
 
     return None
 
+def extract_contact_page(
+    soup: BeautifulSoup,
+    base_url: str,
+) -> str | None:
+    """
+    Find a likely contact page from links.
+    """
+
+    contact_keywords = {
+        "contact",
+        "contact us",
+        "get in touch",
+        "reach us",
+    }
+
+    for link in soup.find_all(
+        "a",
+        href=True,
+    ):
+        text = clean_text(
+            link.get_text(
+                " ",
+                strip=True,
+            )
+        ).lower()
+
+        href = link["href"].strip()
+
+        href_lower = href.lower()
+
+        if (
+            text in contact_keywords
+            or "contact" in href_lower
+        ):
+            return urljoin(
+                base_url,
+                href,
+            )
+
+    return None
+
 def extract_title(
     soup: BeautifulSoup,
 ) -> str | None:

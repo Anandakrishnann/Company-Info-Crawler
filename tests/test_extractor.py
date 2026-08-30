@@ -9,6 +9,7 @@ from app.extraction.extractor import (
     extract_page_data,
     extract_company_name,
     extract_address,
+    extract_contact_page,
 )
 
 
@@ -216,3 +217,29 @@ def test_extract_address():
     assert extract_address(
         soup
     ) == "Kochi, Kerala, India"
+
+def test_extract_contact_page():
+
+    html = """
+    <html>
+        <body>
+            <a href="/contact-us">
+                Contact Us
+            </a>
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    result = extract_contact_page(
+        soup,
+        "https://example.com/",
+    )
+
+    assert result == (
+        "https://example.com/contact-us"
+    )
