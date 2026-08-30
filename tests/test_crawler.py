@@ -193,3 +193,17 @@ def test_highest_score_url_is_selected_first():
     )
 
     assert item["score"] == 80
+    
+
+@pytest.mark.anyio
+async def test_crawler_respects_max_pages():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    pages, stats = await crawler.crawl()
+
+    assert stats.crawled <= 1
+    assert len(pages) <= 1
