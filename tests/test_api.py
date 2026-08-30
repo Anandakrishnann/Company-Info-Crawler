@@ -33,3 +33,33 @@ def test_crawl_accepts_valid_url():
     assert "contact" in data
     assert "pages" in data
     assert "crawl_stats" in data
+    
+
+def test_crawl_response_contains_company_fields():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "https://example.com"
+        },
+    )
+
+    assert response.status_code == 200
+
+    company = response.json()["company"]
+
+    expected_fields = {
+        "name",
+        "website",
+        "description",
+        "headquarters",
+        "locations",
+        "products",
+        "services",
+        "solutions",
+        "industries",
+    }
+
+    assert expected_fields.issubset(
+        company.keys()
+    )
