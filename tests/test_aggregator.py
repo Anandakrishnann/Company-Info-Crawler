@@ -342,3 +342,156 @@ def test_aggregator_merges_multiple_pages():
     assert "Maintenance" in result["services"]
 
     assert result["name"] == "ABC Industries"
+    
+    
+
+def test_aggregator_removes_duplicate_list_values():
+
+    pages = [
+        {
+            "url": "https://example.com/products",
+            "data": {
+                "products": [
+                    "Industrial Pumps",
+                    "Control Systems",
+                ],
+            },
+        },
+        {
+            "url": "https://example.com/services",
+            "data": {
+                "products": [
+                    "Industrial Pumps",
+                    "Hydraulic Pumps",
+                ],
+            },
+        },
+    ]
+
+    result = aggregate_company_data(pages)
+
+    assert result["products"] == [
+        "Industrial Pumps",
+        "Control Systems",
+        "Hydraulic Pumps",
+    ]
+    
+
+def test_aggregator_ignores_empty_values():
+
+    aggregator = CompanyAggregator()
+
+    aggregator.add_page_data(
+        {
+            "name": "",
+            "website": "   ",
+            "description": None,
+            "products": [
+                "",
+                "   ",
+                "Industrial Pumps",
+            ],
+            "services": [],
+            "emails": [
+                "",
+                "info@example.com",
+            ],
+        },
+        "https://example.com/products",
+    )
+
+    result = aggregator.result()
+
+    assert result["name"] is None
+    assert result["website"] is None
+    assert result["description"] is None
+
+    assert result["products"] == [
+        "Industrial Pumps"
+    ]
+
+    assert result["emails"] == [
+        "info@example.com"
+    ]
+    
+def test_aggregator_tracks_source_urls():
+
+    aggregator = CompanyAggregator()
+
+    aggregator.add_page_data(
+        {
+            "name": "ABC Industries",
+            "description": "Industrial company.",
+        },
+        "https://example.com/about",
+    )
+
+    sources = aggregator.source_map()
+
+    assert sources["name"] == [
+        "https://example.com/about"
+    ]
+
+    assert sources["description"] == [
+        "https://example.com/about"
+    ]
+    
+    
+def test_aggregator_preserves_first_contact_page():
+
+    aggregator = CompanyAggregator()
+
+    aggregator.add_page_data(
+        {
+            "contact_page": (
+                "https://example.com/contact"
+            ),
+        },
+        "https://example.com/contact",
+    )
+
+    aggregator.add_page_data(
+        {
+            "contact_page": (
+                "https://example.com/contact-us"
+            ),
+        },
+        "https://example.com/contact-us",
+    )
+
+    result = aggregator.result()
+
+    assert result["contact_page"] == (
+        "https://example.com/contact"
+    )
+    
+def test_aggregator_merges_unique_social_profiles():
+
+    pages = [
+        {
+            "url": "https://example.com/about",
+            "data": {
+                "social_profiles": [
+                    "https://linkedin.com/company/abc",
+                    "https://facebook.com/abc",
+                ],
+            },
+        },
+        {
+            "url": "https://example.com/contact",
+            "data": {
+                "social_profiles": [
+                    "https://linkedin.com/company/abc",
+                    "https://twitter.com/abc",
+                ],
+            },
+        },
+    ]
+
+    result = aggregate_company_data(pages)
+
+    assert result["social_profiles"] == [
+        "https://linkedin.com/company/abc",
+        "https://facebook.com/abc",
+        "https://twitter.com/abc",
+    ]
