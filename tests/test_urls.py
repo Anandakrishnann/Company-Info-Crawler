@@ -107,3 +107,39 @@ def test_contact_is_relevant():
     )
 
     assert score >= 10
+    
+
+def test_products_is_relevant():
+
+    score = calculate_relevance(
+        "https://example.com/products"
+    )
+
+    assert score >= 10
+
+
+def test_services_is_relevant():
+
+    score = calculate_relevance(
+        "https://example.com/services"
+    )
+
+    assert score >= 10
+
+
+def test_solutions_is_relevant():
+
+    score = calculate_relevance(
+        "https://example.com/solutions"
+    )
+
+    assert score >= 10
+
+
+def test_industries_is_relevant():
+
+    score = calculate_relevance(
+        "https://example.com/industries"
+    )
+
+    assert score >= 10
