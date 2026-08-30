@@ -144,3 +144,29 @@ def test_crawl_response_contains_stats():
 
     assert stats["crawled"] >= 1
     assert stats["failed"] == 0
+    
+    
+def test_crawl_response_contains_pages():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "https://example.com"
+        },
+    )
+
+    assert response.status_code == 200
+
+    pages = response.json()["pages"]
+
+    assert isinstance(pages, list)
+    assert len(pages) >= 1
+
+    page = pages[0]
+
+    assert "url" in page
+    assert "title" in page
+    assert "category" in page
+    assert "status_code" in page
+    assert "processed" in page
+    assert "extraction_result" in page
