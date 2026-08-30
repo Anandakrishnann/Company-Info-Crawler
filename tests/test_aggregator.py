@@ -161,3 +161,29 @@ def test_description_conflict_keeps_first_value():
     assert result["description"] == (
         "ABC Industries is a manufacturer."
     )
+    
+
+def test_scalar_field_source_is_recorded():
+
+    aggregator = CompanyAggregator()
+
+    source_url = (
+        "https://abcindustries.com/about"
+    )
+
+    aggregator.add_page_data(
+        {
+            "name": "ABC Industries",
+            "website": "https://abcindustries.com/",
+            "description": (
+                "ABC Industries is a manufacturer."
+            ),
+        },
+        source_url,
+    )
+
+    sources = aggregator.source_map()
+
+    assert sources["description"] == [
+        source_url
+    ]
