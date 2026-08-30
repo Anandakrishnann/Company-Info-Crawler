@@ -234,3 +234,11 @@ def test_crawl_rejects_empty_url():
     )
 
     assert response.status_code == 422
+    
+def test_crawl_rejects_missing_body():
+
+    response = client.post(
+        "/crawl",
+    )
+
+    assert response.status_code == 422
