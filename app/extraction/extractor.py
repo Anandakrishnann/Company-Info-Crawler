@@ -560,6 +560,23 @@ def extract_category_items(
     )
 
     candidates = []
+    
+    ignored_items = {
+        "home",
+        "login",
+        "sign in",
+        "register",
+        "privacy policy",
+        "cookie policy",
+        "terms",
+        "terms and conditions",
+        "contact",
+        "contact us",
+        "about us",
+        "learn more",
+        "read more",
+        "subscribe",
+    }
 
     # Collect headings.
     for tag in soup.find_all(
@@ -577,9 +594,10 @@ def extract_category_items(
 
         lower_text = text.lower()
 
-        # Ignore headings that are simply
-        # the category title itself.
         if lower_text in keywords:
+            continue
+
+        if lower_text in ignored_items:
             continue
 
         candidates.append(text)
@@ -597,6 +615,9 @@ def extract_category_items(
             continue
 
         if len(text) < 3 or len(text) > 150:
+            continue
+
+        if text.lower() in ignored_items:
             continue
 
         candidates.append(text)

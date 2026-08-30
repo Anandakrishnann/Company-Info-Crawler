@@ -465,3 +465,46 @@ def test_page_data_uses_category_extraction():
     assert "Hydraulic Pumps" in data["products"]
 
     assert "Our Products" not in data["products"]
+    
+
+def test_category_items_ignore_navigation_noise():
+
+    html = """
+    <html>
+        <body>
+
+            <h1>Our Products</h1>
+
+            <h2>Industrial Pumps</h2>
+            <h2>Control Systems</h2>
+            <h2>Privacy Policy</h2>
+            <h2>Contact Us</h2>
+
+            <ul>
+                <li>Hydraulic Pumps</li>
+                <li>Learn More</li>
+                <li>Cookie Policy</li>
+            </ul>
+
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    result = extract_category_items(
+        soup,
+        "products",
+    )
+
+    assert "Industrial Pumps" in result
+    assert "Control Systems" in result
+    assert "Hydraulic Pumps" in result
+
+    assert "Privacy Policy" not in result
+    assert "Contact Us" not in result
+    assert "Learn More" not in result
+    assert "Cookie Policy" not in result
