@@ -210,3 +210,31 @@ def test_description_conflict_keeps_first_value():
     assert result["description"] == (
         "ABC Industries is a manufacturer."
     )
+    
+def aggregate_company_data(
+    pages: list[dict],
+) -> dict:
+    """
+    Aggregate extracted data from multiple pages
+    into a single company profile.
+    """
+
+    aggregator = CompanyAggregator()
+
+    for page in pages:
+        if not isinstance(page, dict):
+            continue
+
+        page_data = page.get("data", {})
+
+        if not isinstance(page_data, dict):
+            continue
+
+        source_url = page.get("url")
+
+        aggregator.add_page_data(
+            page_data,
+            source_url,
+        )
+
+    return aggregator.result()

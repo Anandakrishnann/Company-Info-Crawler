@@ -1,9 +1,7 @@
 from app.extraction.aggregator import (
     CompanyAggregator,
-    
-    
+    aggregate_company_data,
 )
-
 
 def test_scalar_value_is_preserved():
 
@@ -283,3 +281,64 @@ def test_missing_scalar_does_not_overwrite_existing_value():
     assert result["description"] == (
         "ABC Industries is a manufacturer."
     )
+    
+def test_aggregator_merges_multiple_pages():
+
+    pages = [
+        {
+            "url": "https://example.com/products",
+            "category": "products",
+            "data": {
+                "name": "ABC Industries",
+                "website": "https://example.com/",
+                "description": "Industrial company.",
+                "headquarters": None,
+                "locations": [],
+                "products": [
+                    "Industrial Pumps",
+                    "Control Systems",
+                ],
+                "services": [],
+                "solutions": [],
+                "industries": [],
+                "emails": [],
+                "phones": [],
+                "address": None,
+                "contact_page": None,
+                "social_profiles": [],
+            },
+        },
+        {
+            "url": "https://example.com/services",
+            "category": "services",
+            "data": {
+                "name": "ABC Industries",
+                "website": "https://example.com/",
+                "description": "Another description.",
+                "headquarters": None,
+                "locations": [],
+                "products": [],
+                "services": [
+                    "Installation",
+                    "Maintenance",
+                ],
+                "solutions": [],
+                "industries": [],
+                "emails": [],
+                "phones": [],
+                "address": None,
+                "contact_page": None,
+                "social_profiles": [],
+            },
+        },
+    ]
+
+    result = aggregate_company_data(pages)
+
+    assert "Industrial Pumps" in result["products"]
+    assert "Control Systems" in result["products"]
+
+    assert "Installation" in result["services"]
+    assert "Maintenance" in result["services"]
+
+    assert result["name"] == "ABC Industries"
