@@ -143,3 +143,12 @@ def test_industries_is_relevant():
     )
 
     assert score >= 10
+    
+
+def test_generic_page_has_low_relevance():
+
+    score = calculate_relevance(
+        "https://example.com/random-page"
+    )
+
+    assert score == 0
