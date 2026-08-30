@@ -1,3 +1,4 @@
+from app.crawler.crawler import WebsiteCrawler
 from app.crawler.url_manager import (
     calculate_relevance,
     extract_links,
@@ -404,4 +405,26 @@ def test_extract_links_normalizes_tracking_parameters():
         urls.count(
             "https://example.com/about"
         ) == 1
+    )
+    
+def test_homepage_has_highest_initial_priority():
+
+    crawler = WebsiteCrawler(
+        "https://example.com"
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/about",
+        score=10,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/contact",
+        score=20,
+    )
+
+    item = crawler._get_next_url()
+
+    assert item["url"] == (
+        "https://example.com/"
     )
