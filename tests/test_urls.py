@@ -311,3 +311,61 @@ def test_extract_links_resolves_relative_urls():
         "https://example.com/company/products"
         in urls
     )
+    
+
+def test_extract_links_ignores_non_http_links():
+
+    html = """
+    <html>
+        <body>
+
+            <a href="/about">
+                About
+            </a>
+
+            <a href="mailto:info@example.com">
+                Email
+            </a>
+
+            <a href="tel:+1234567890">
+                Phone
+            </a>
+
+            <a href="javascript:void(0)">
+                JavaScript
+            </a>
+
+        </body>
+    </html>
+    """
+
+    links = extract_links(
+        html=html,
+        current_url="https://example.com/",
+        base_domain="example.com",
+    )
+
+    urls = [
+        link["url"]
+        for link in links
+    ]
+
+    assert (
+        "https://example.com/about"
+        in urls
+    )
+
+    assert not any(
+        url.startswith("mailto:")
+        for url in urls
+    )
+
+    assert not any(
+        url.startswith("tel:")
+        for url in urls
+    )
+
+    assert not any(
+        url.startswith("javascript:")
+        for url in urls
+    )
