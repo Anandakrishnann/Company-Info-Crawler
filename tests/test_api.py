@@ -63,3 +63,29 @@ def test_crawl_response_contains_company_fields():
     assert expected_fields.issubset(
         company.keys()
     )
+    
+    
+def test_crawl_response_contains_contact_fields():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "https://example.com"
+        },
+    )
+
+    assert response.status_code == 200
+
+    contact = response.json()["contact"]
+
+    expected_fields = {
+        "emails",
+        "phones",
+        "address",
+        "contact_page",
+        "social_profiles",
+    }
+
+    assert expected_fields.issubset(
+        contact.keys()
+    )
