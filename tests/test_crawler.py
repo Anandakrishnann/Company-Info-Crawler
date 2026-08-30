@@ -136,3 +136,27 @@ def test_meaningful_query_parameters_are_preserved():
         "https://example.com/products?category=valves"
         in crawler.visited
     )
+    
+
+def test_fragment_urls_are_deduplicated():
+
+    crawler = WebsiteCrawler(
+        "https://example.com"
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/about#team",
+        score=10,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/about#contact",
+        score=10,
+    )
+
+    assert (
+        "https://example.com/about"
+        in crawler.visited
+    )
+
+    assert len(crawler.visited) == 2
