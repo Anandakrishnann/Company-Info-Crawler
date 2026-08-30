@@ -319,3 +319,117 @@ def test_extract_product_items():
     assert "Hydraulic Pumps" in result
 
     assert "Our Products" not in result
+
+def test_extract_service_items():
+
+    html = """
+    <html>
+        <body>
+
+            <h1>Our Services</h1>
+
+            <h2>Consulting</h2>
+            <h2>Maintenance</h2>
+
+            <ul>
+                <li>Technical Support</li>
+                <li>Installation</li>
+            </ul>
+
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    result = extract_category_items(
+        soup,
+        "services",
+    )
+
+    assert "Consulting" in result
+    assert "Maintenance" in result
+    assert "Technical Support" in result
+    assert "Installation" in result
+
+    assert "Our Services" not in result
+
+
+def test_extract_solution_items():
+
+    html = """
+    <html>
+        <body>
+
+            <h1>Our Solutions</h1>
+
+            <h2>Automation Solutions</h2>
+            <h2>Cloud Solutions</h2>
+
+            <ul>
+                <li>Digital Transformation</li>
+                <li>Enterprise Integration</li>
+            </ul>
+
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    result = extract_category_items(
+        soup,
+        "solutions",
+    )
+
+    assert "Automation Solutions" in result
+    assert "Cloud Solutions" in result
+    assert "Digital Transformation" in result
+    assert "Enterprise Integration" in result
+
+    assert "Our Solutions" not in result
+
+
+def test_extract_industry_items():
+
+    html = """
+    <html>
+        <body>
+
+            <h1>Industries We Serve</h1>
+
+            <h2>Healthcare</h2>
+            <h2>Manufacturing</h2>
+
+            <ul>
+                <li>Automotive</li>
+                <li>Energy</li>
+            </ul>
+
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    result = extract_category_items(
+        soup,
+        "industries",
+    )
+
+    assert "Healthcare" in result
+    assert "Manufacturing" in result
+    assert "Automotive" in result
+    assert "Energy" in result
+
+    
+    
