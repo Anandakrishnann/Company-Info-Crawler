@@ -207,3 +207,30 @@ async def test_crawler_respects_max_pages():
 
     assert stats.crawled <= 1
     assert len(pages) <= 1
+    
+
+def test_crawler_only_accepts_internal_domain():
+
+    crawler = WebsiteCrawler(
+        "https://example.com"
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/products",
+        score=50,
+    )
+
+    crawler._add_to_queue(
+        "https://google.com",
+        score=100,
+    )
+
+    assert (
+        "https://example.com/products"
+        in crawler.visited
+    )
+
+    assert (
+        "https://google.com"
+        not in crawler.visited
+    )
