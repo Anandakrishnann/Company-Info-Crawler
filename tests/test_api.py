@@ -89,3 +89,58 @@ def test_crawl_response_contains_contact_fields():
     assert expected_fields.issubset(
         contact.keys()
     )
+    
+
+def test_crawl_response_contains_stats():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "https://example.com"
+        },
+    )
+
+    assert response.status_code == 200
+
+    stats = response.json()["crawl_stats"]
+
+    expected_fields = {
+        "discovered",
+        "crawled",
+        "skipped",
+        "failed",
+    }
+
+    assert expected_fields.issubset(
+        stats.keys()
+    )
+
+    assert stats["crawled"] >= 1
+    assert stats["failed"] == 0
+    
+def test_crawl_response_contains_stats():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "https://example.com"
+        },
+    )
+
+    assert response.status_code == 200
+
+    stats = response.json()["crawl_stats"]
+
+    expected_fields = {
+        "discovered",
+        "crawled",
+        "skipped",
+        "failed",
+    }
+
+    assert expected_fields.issubset(
+        stats.keys()
+    )
+
+    assert stats["crawled"] >= 1
+    assert stats["failed"] == 0
