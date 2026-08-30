@@ -170,3 +170,20 @@ def test_crawl_response_contains_pages():
     assert "status_code" in page
     assert "processed" in page
     assert "extraction_result" in page
+    
+    
+def test_crawl_page_is_processed():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "https://example.com"
+        },
+    )
+
+    assert response.status_code == 200
+
+    pages = response.json()["pages"]
+
+    assert pages[0]["processed"] is True
+    assert pages[0]["status_code"] == 200
