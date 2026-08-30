@@ -557,3 +557,29 @@ def test_category_items_remove_duplicates():
     assert normalized.count(
         "hydraulic pumps"
     ) == 1
+    
+
+def test_extract_page_data_handles_empty_html():
+
+    data = extract_page_data(
+        "<html><body></body></html>",
+        "https://example.com/empty",
+        "home",
+    )
+
+    assert data["name"] is None
+    assert data["description"] is None
+
+    assert data["emails"] == []
+    assert data["phones"] == []
+
+    assert data["products"] == []
+    assert data["services"] == []
+    assert data["solutions"] == []
+    assert data["industries"] == []
+
+    assert data["headquarters"] is None
+    assert data["locations"] == []
+    assert data["address"] is None
+    assert data["contact_page"] is None
+    assert data["social_profiles"] == []
