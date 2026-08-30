@@ -176,3 +176,37 @@ class CompanyAggregator:
         """
 
         return dict(self.sources)
+    
+
+
+def test_description_conflict_keeps_first_value():
+
+    aggregator = CompanyAggregator()
+
+    aggregator.add_page_data(
+        {
+            "name": "ABC Industries",
+            "website": "https://abcindustries.com/",
+            "description": (
+                "ABC Industries is a manufacturer."
+            ),
+        },
+        "https://abcindustries.com/about",
+    )
+
+    aggregator.add_page_data(
+        {
+            "name": "ABC Industries",
+            "website": "https://abcindustries.com/",
+            "description": (
+                "ABC Industries is a technology company."
+            ),
+        },
+        "https://abcindustries.com/contact",
+    )
+
+    result = aggregator.result()
+
+    assert result["description"] == (
+        "ABC Industries is a manufacturer."
+    )
