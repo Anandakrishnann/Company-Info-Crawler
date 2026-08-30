@@ -503,3 +503,98 @@ def extract_page_data(
         data["contact_page"] = url
 
     return data
+
+
+def extract_category_items(
+    soup: BeautifulSoup,
+    category: str,
+) -> list[str]:
+    """
+    Extract likely items for a specific page category.
+
+    Uses headings and list items while filtering out
+    common navigation and boilerplate text.
+    """
+
+    category_keywords = {
+        "products": {
+            "product",
+            "products",
+            "product range",
+            "product portfolio",
+        },
+        "services": {
+            "service",
+            "services",
+            "what we do",
+            "our services",
+        },
+        "solutions": {
+            "solution",
+            "solutions",
+            "our solutions",
+        },
+        "industries": {
+            "industry",
+            "industries",
+            "sectors",
+            "markets",
+        },
+    }
+
+    keywords = category_keywords.get(
+        category,
+        set(),
+    )
+
+    candidates = []
+
+    # Collect headings.
+    for tag in soup.find_all(
+        ["h2", "h3"]
+    ):
+        text = clean_text(
+            tag.get_text(
+                " ",
+                strip=True,
+            )
+        )
+
+        if not text:
+            continue
+
+        lower_text = text.lower()
+
+        # Ignore headings that are simply
+        # the category title itself.
+        if lower_text in keywords:
+            continue
+
+        candidates.append(text)
+
+    # Collect list items.
+    for tag in soup.find_all("li"):
+        text = clean_text(
+            tag.get_text(
+                " ",
+                strip=True,
+            )
+        )
+
+        if not text:
+            continue
+
+        if len(text) < 3 or len(text) > 150:
+            continue
+
+        candidates.append(text)
+
+    # Remove duplicates while preserving order.
+    result = []
+
+    for item in candidates:
+
+        if item not in result:
+            result.append(item)
+
+    return result

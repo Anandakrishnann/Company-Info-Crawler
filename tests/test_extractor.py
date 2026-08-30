@@ -10,6 +10,7 @@ from app.extraction.extractor import (
     extract_company_name,
     extract_address,
     extract_contact_page,
+    extract_category_items
 )
 
 
@@ -280,3 +281,41 @@ def test_page_data_includes_contact_information():
     assert data["contact_page"] == (
         "https://example.com/contact"
     )
+    
+
+def test_extract_product_items():
+
+    html = """
+    <html>
+        <body>
+
+            <h1>Our Products</h1>
+
+            <h2>Industrial Pumps</h2>
+            <h2>Control Systems</h2>
+
+            <ul>
+                <li>Pressure Pumps</li>
+                <li>Hydraulic Pumps</li>
+            </ul>
+
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    result = extract_category_items(
+        soup,
+        "products",
+    )
+
+    assert "Industrial Pumps" in result
+    assert "Control Systems" in result
+    assert "Pressure Pumps" in result
+    assert "Hydraulic Pumps" in result
+
+    assert "Our Products" not in result
