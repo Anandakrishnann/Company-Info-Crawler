@@ -508,3 +508,52 @@ def test_category_items_ignore_navigation_noise():
     assert "Contact Us" not in result
     assert "Learn More" not in result
     assert "Cookie Policy" not in result
+    
+def test_category_items_remove_duplicates():
+
+    html = """
+    <html>
+        <body>
+
+            <h1>Our Products</h1>
+
+            <h2>Industrial Pumps</h2>
+            <h2>industrial pumps</h2>
+            <h2>Control Systems</h2>
+
+            <ul>
+                <li>Industrial Pumps</li>
+                <li>CONTROL SYSTEMS</li>
+                <li>Hydraulic Pumps</li>
+            </ul>
+
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    result = extract_category_items(
+        soup,
+        "products",
+    )
+
+    normalized = [
+        item.lower()
+        for item in result
+    ]
+
+    assert normalized.count(
+        "industrial pumps"
+    ) == 1
+
+    assert normalized.count(
+        "control systems"
+    ) == 1
+
+    assert normalized.count(
+        "hydraulic pumps"
+    ) == 1

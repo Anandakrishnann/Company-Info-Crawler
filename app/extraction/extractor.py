@@ -623,11 +623,19 @@ def extract_category_items(
         candidates.append(text)
 
     # Remove duplicates while preserving order.
+    # Comparison is case-insensitive, but the original
+    # formatting of the first occurrence is preserved.
     result = []
+    seen = set()
 
     for item in candidates:
+        cleaned_item = item.strip()
+        key = cleaned_item.lower()
 
-        if item not in result:
-            result.append(item)
+        if key in seen:
+            continue
+
+        seen.add(key)
+        result.append(cleaned_item)
 
     return result
