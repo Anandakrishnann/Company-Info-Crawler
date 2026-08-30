@@ -152,3 +152,12 @@ def test_generic_page_has_low_relevance():
     )
 
     assert score == 0
+    
+def test_anchor_text_can_increase_relevance():
+
+    score = calculate_relevance(
+        "https://example.com/catalog",
+        anchor_text="Our Products",
+    )
+
+    assert score >= 9
