@@ -1,11 +1,11 @@
 from app.crawler.url_manager import (
     calculate_relevance,
+    extract_links,
     is_http_url,
     is_ignored_resource,
     is_internal_url,
     normalize_url,
 )
-
 
 def test_fragment_is_removed():
     url = "https://example.com/about#team"
@@ -161,3 +161,74 @@ def test_anchor_text_can_increase_relevance():
     )
 
     assert score >= 9
+    
+    
+def test_extract_links_prioritizes_company_pages():
+
+    html = """
+    <html>
+        <body>
+
+            <a href="/random-page">
+                Random Page
+            </a>
+
+            <a href="/contact">
+                Contact Us
+            </a>
+
+            <a href="/products">
+                Our Products
+            </a>
+
+            <a href="https://google.com">
+                Google
+            </a>
+
+            <a href="/brochure.pdf">
+                Brochure
+            </a>
+
+        </body>
+    </html>
+    """
+
+    links = extract_links(
+        html=html,
+        current_url="https://example.com/",
+        base_domain="example.com",
+    )
+
+    urls = [
+        link["url"]
+        for link in links
+    ]
+
+    assert (
+        "https://example.com/products"
+        in urls
+    )
+
+    assert (
+        "https://example.com/contact"
+        in urls
+    )
+
+    assert (
+        "https://example.com/random-page"
+        in urls
+    )
+
+    assert (
+        "https://google.com"
+        not in urls
+    )
+
+    assert (
+        "https://example.com/brochure.pdf"
+        not in urls
+    )
+
+    assert links[0]["url"] == (
+        "https://example.com/products"
+    )
