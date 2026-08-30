@@ -110,3 +110,29 @@ def test_tracking_query_urls_are_deduplicated():
     )
 
     assert len(crawler.visited) == 2
+    
+def test_meaningful_query_parameters_are_preserved():
+
+    crawler = WebsiteCrawler(
+        "https://example.com"
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/products?category=pumps",
+        score=10,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/products?category=valves",
+        score=10,
+    )
+
+    assert (
+        "https://example.com/products?category=pumps"
+        in crawler.visited
+    )
+
+    assert (
+        "https://example.com/products?category=valves"
+        in crawler.visited
+    )
