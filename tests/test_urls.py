@@ -764,3 +764,43 @@ async def test_crawler_handles_empty_html():
 
     assert pages[0].processed is False
     assert pages[0].status_code == 200
+    
+
+@pytest.mark.anyio
+async def test_crawler_preserves_final_url():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    html = """
+    <html>
+        <head>
+            <title>ABC Industries</title>
+        </head>
+        <body>
+            <p>Company information.</p>
+        </body>
+    </html>
+    """
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/about",
+                html,
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert stats.crawled == 1
+    assert len(pages) == 1
+
+    assert pages[0].url == (
+        "https://example.com/about"
+    )
