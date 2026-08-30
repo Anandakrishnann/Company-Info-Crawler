@@ -160,3 +160,36 @@ def test_fragment_urls_are_deduplicated():
     )
 
     assert len(crawler.visited) == 2
+    
+    
+def test_highest_score_url_is_selected_first():
+
+    crawler = WebsiteCrawler(
+        "https://example.com"
+    )
+
+    # Remove the automatically queued homepage
+    crawler.queue.clear()
+
+    crawler._add_to_queue(
+        "https://example.com/contact",
+        score=20,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/products",
+        score=80,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/about",
+        score=50,
+    )
+
+    item = crawler._get_next_url()
+
+    assert item["url"] == (
+        "https://example.com/products"
+    )
+
+    assert item["score"] == 80
