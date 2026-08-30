@@ -271,3 +271,43 @@ def test_extract_links_removes_duplicates():
     ) == 1
 
     assert len(links) == 1
+    
+
+def test_extract_links_resolves_relative_urls():
+
+    html = """
+    <html>
+        <body>
+
+            <a href="/about">
+                About
+            </a>
+
+            <a href="products">
+                Products
+            </a>
+
+        </body>
+    </html>
+    """
+
+    links = extract_links(
+        html=html,
+        current_url="https://example.com/company/",
+        base_domain="example.com",
+    )
+
+    urls = [
+        link["url"]
+        for link in links
+    ]
+
+    assert (
+        "https://example.com/about"
+        in urls
+    )
+
+    assert (
+        "https://example.com/company/products"
+        in urls
+    )
