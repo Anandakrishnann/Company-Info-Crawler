@@ -243,3 +243,40 @@ def test_extract_contact_page():
     assert result == (
         "https://example.com/contact-us"
     )
+
+
+def test_page_data_includes_contact_information():
+
+    html = """
+    <html>
+        <head>
+            <title>ABC Industries</title>
+        </head>
+
+        <body>
+
+            <address>
+                Kochi, Kerala, India
+            </address>
+
+            <a href="/contact">
+                Contact Us
+            </a>
+
+        </body>
+    </html>
+    """
+
+    data = extract_page_data(
+        html,
+        "https://example.com/about",
+        "about",
+    )
+
+    assert data["address"] == (
+        "Kochi, Kerala, India"
+    )
+
+    assert data["contact_page"] == (
+        "https://example.com/contact"
+    )

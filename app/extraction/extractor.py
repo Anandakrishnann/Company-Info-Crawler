@@ -457,20 +457,20 @@ def extract_page_data(
     )
 
     data = {
-        "name": None,
+        "name": extract_company_name(soup),
         "website": url,
-        "description": None,
+        "description": extract_description(soup),
         "headquarters": None,
         "locations": [],
         "products": [],
         "services": [],
         "solutions": [],
         "industries": [],
-        "emails": [],
-        "phones": [],
-        "address": None,
-        "contact_page": None,
-        "social_profiles": [],
+        "emails": extract_emails(soup),
+        "phones": extract_phones(soup),
+        "address": extract_address(soup),
+        "contact_page": extract_contact_page(soup, url),
+        "social_profiles": extract_social_profiles(soup,url,),
     }
 
     # Common extraction.
