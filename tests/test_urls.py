@@ -232,3 +232,42 @@ def test_extract_links_prioritizes_company_pages():
     assert links[0]["url"] == (
         "https://example.com/products"
     )
+    
+def test_extract_links_removes_duplicates():
+
+    html = """
+    <html>
+        <body>
+
+            <a href="/about">
+                About
+            </a>
+
+            <a href="/about/">
+                About Company
+            </a>
+
+            <a href="/about#team">
+                Our Team
+            </a>
+
+        </body>
+    </html>
+    """
+
+    links = extract_links(
+        html=html,
+        current_url="https://example.com/",
+        base_domain="example.com",
+    )
+
+    urls = [
+        link["url"]
+        for link in links
+    ]
+
+    assert urls.count(
+        "https://example.com/about"
+    ) == 1
+
+    assert len(links) == 1
