@@ -212,3 +212,46 @@ def test_list_field_source_is_recorded():
     assert sources["products"] == [
         source_url
     ]
+    
+
+def test_duplicate_list_value_keeps_multiple_sources():
+
+    aggregator = CompanyAggregator()
+
+    first_url = (
+        "https://abcindustries.com/about"
+    )
+
+    second_url = (
+        "https://abcindustries.com/products"
+    )
+
+    aggregator.add_page_data(
+        {
+            "products": [
+                "Industrial Pumps",
+            ],
+        },
+        first_url,
+    )
+
+    aggregator.add_page_data(
+        {
+            "products": [
+                "Industrial Pumps",
+            ],
+        },
+        second_url,
+    )
+
+    result = aggregator.result()
+    sources = aggregator.source_map()
+
+    assert result["products"] == [
+        "Industrial Pumps"
+    ]
+
+    assert sources["products"] == [
+        first_url,
+        second_url,
+    ]
