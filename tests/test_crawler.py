@@ -91,3 +91,22 @@ def test_non_html_resources_are_not_added():
         "https://example.com/brochure.zip"
         not in crawler.visited
     )
+    
+
+def test_tracking_query_urls_are_deduplicated():
+
+    crawler = WebsiteCrawler(
+        "https://example.com"
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/about?utm_source=google",
+        score=10,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/about?utm_source=facebook",
+        score=10,
+    )
+
+    assert len(crawler.visited) == 2
