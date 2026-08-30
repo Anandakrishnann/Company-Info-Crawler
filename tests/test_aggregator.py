@@ -187,3 +187,28 @@ def test_scalar_field_source_is_recorded():
     assert sources["description"] == [
         source_url
     ]
+    
+
+def test_list_field_source_is_recorded():
+
+    aggregator = CompanyAggregator()
+
+    source_url = (
+        "https://abcindustries.com/products"
+    )
+
+    aggregator.add_page_data(
+        {
+            "products": [
+                "Industrial Pumps",
+                "Control Systems",
+            ],
+        },
+        source_url,
+    )
+
+    sources = aggregator.source_map()
+
+    assert sources["products"] == [
+        source_url
+    ]
