@@ -151,7 +151,7 @@ class WebsiteCrawler:
             )
 
             # Request failed or content wasn't HTML.
-            if not html:
+            if not html or status_code >= 400:
                 self.stats.failed += 1
 
                 self.pages.append(

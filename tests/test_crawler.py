@@ -1,3 +1,5 @@
+from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 import pytest
 
 from app.crawler.crawler import WebsiteCrawler
@@ -234,3 +236,33 @@ def test_crawler_only_accepts_internal_domain():
         "https://google.com"
         not in crawler.visited
     )
+    
+@pytest.mark.anyio
+async def test_crawler_handles_http_error_status():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    mock_fetch = AsyncMock(
+        return_value=(
+            403,
+            "https://example.com/",
+            "<html><title>Access Denied</title></html>",
+        )
+    )
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        mock_fetch,
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert stats.crawled == 0
+    assert stats.failed == 1
+
+    assert len(pages) == 1
+    assert pages[0].status_code == 403
+    assert pages[0].processed is False
