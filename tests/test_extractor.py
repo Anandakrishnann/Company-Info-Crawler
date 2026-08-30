@@ -433,3 +433,35 @@ def test_extract_industry_items():
 
     
     
+def test_page_data_uses_category_extraction():
+
+    html = """
+    <html>
+        <body>
+
+            <h1>Our Products</h1>
+
+            <h2>Industrial Pumps</h2>
+            <h2>Control Systems</h2>
+
+            <ul>
+                <li>Pressure Pumps</li>
+                <li>Hydraulic Pumps</li>
+            </ul>
+
+        </body>
+    </html>
+    """
+
+    data = extract_page_data(
+        html,
+        "https://example.com/products",
+        "products",
+    )
+
+    assert "Industrial Pumps" in data["products"]
+    assert "Control Systems" in data["products"]
+    assert "Pressure Pumps" in data["products"]
+    assert "Hydraulic Pumps" in data["products"]
+
+    assert "Our Products" not in data["products"]

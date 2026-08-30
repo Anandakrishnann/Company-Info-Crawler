@@ -502,6 +502,18 @@ def extract_page_data(
     if category == "contact":
         data["contact_page"] = url
 
+    # Category-specific extraction.
+    if category in {
+        "products",
+        "services",
+        "solutions",
+        "industries",
+    }:
+        data[category] = extract_category_items(
+            soup,
+            category,
+        )
+
     return data
 
 
