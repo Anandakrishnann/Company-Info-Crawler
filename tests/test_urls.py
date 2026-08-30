@@ -574,3 +574,193 @@ async def test_crawler_returns_page_metadata():
     assert pages[0].extraction_result[
         "html_length"
     ] == len(html)
+    
+@pytest.mark.anyio
+async def test_crawler_discovers_internal_links():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    html = """
+    <html>
+        <body>
+            <a href="/about">About</a>
+            <a href="/products">Products</a>
+        </body>
+    </html>
+    """
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/",
+                html,
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert (
+        "https://example.com/about"
+        in crawler.visited
+    )
+
+    assert (
+        "https://example.com/products"
+        in crawler.visited
+    )
+    
+@pytest.mark.anyio
+async def test_crawler_discovers_internal_links():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    html = """
+    <html>
+        <body>
+            <a href="/about">About</a>
+            <a href="/products">Products</a>
+        </body>
+    </html>
+    """
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/",
+                html,
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert (
+        "https://example.com/about"
+        in crawler.visited
+    )
+
+    assert (
+        "https://example.com/products"
+        in crawler.visited
+    )
+    
+    
+@pytest.mark.anyio
+async def test_crawler_respects_max_pages():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=2,
+    )
+
+    html = """
+    <html>
+        <body>
+            <a href="/about">About</a>
+            <a href="/products">Products</a>
+            <a href="/contact">Contact</a>
+        </body>
+    </html>
+    """
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/",
+                html,
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert stats.crawled == 2
+    assert len(pages) == 2
+    
+
+@pytest.mark.anyio
+async def test_crawler_does_not_crawl_external_links():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=5,
+    )
+
+    html = """
+    <html>
+        <body>
+            <a href="/about">About</a>
+            <a href="https://google.com">Google</a>
+            <a href="https://github.com">GitHub</a>
+        </body>
+    </html>
+    """
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/",
+                html,
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert (
+        "https://example.com/about"
+        in crawler.visited
+    )
+
+    assert (
+        "https://google.com"
+        not in crawler.visited
+    )
+
+    assert (
+        "https://github.com"
+        not in crawler.visited
+    )
+    
+@pytest.mark.anyio
+async def test_crawler_handles_empty_html():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/",
+                "",
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert stats.crawled == 0
+    assert stats.failed == 1
+    assert len(pages) == 1
+
+    assert pages[0].processed is False
+    assert pages[0].status_code == 200
