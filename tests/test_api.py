@@ -187,3 +187,26 @@ def test_crawl_page_is_processed():
 
     assert pages[0]["processed"] is True
     assert pages[0]["status_code"] == 200
+    
+    
+    
+def test_crawl_normalizes_homepage_url():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "https://example.com/"
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["company"]["website"] == (
+        "https://example.com/"
+    )
+
+    assert data["pages"][0]["url"] == (
+        "https://example.com/"
+    )
