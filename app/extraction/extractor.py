@@ -156,6 +156,53 @@ def extract_company_name(
 
     return None
 
+
+def extract_address(
+    soup: BeautifulSoup,
+) -> str | None:
+    """
+    Extract a likely physical company address.
+
+    Priority:
+    1. Semantic <address> element
+    2. Elements with address/location-related classes
+    """
+
+    # 1. Semantic HTML address element
+    address = soup.find("address")
+
+    if address:
+        text = clean_text(
+            address.get_text(
+                " ",
+                strip=True,
+            )
+        )
+
+        if text:
+            return text
+
+    # 2. Common address/location classes
+    element = soup.find(
+        class_=re.compile(
+            r"address|location",
+            re.IGNORECASE,
+        )
+    )
+
+    if element:
+        text = clean_text(
+            element.get_text(
+                " ",
+                strip=True,
+            )
+        )
+
+        if 10 <= len(text) <= 500:
+            return text
+
+    return None
+
 def extract_title(
     soup: BeautifulSoup,
 ) -> str | None:

@@ -8,6 +8,7 @@ from app.extraction.extractor import (
     extract_title,
     extract_page_data,
     extract_company_name,
+    extract_address,
 )
 
 
@@ -194,3 +195,24 @@ def test_extract_company_name_from_json_ld():
     assert extract_company_name(
         soup
     ) == "ABC Industries"
+
+def test_extract_address():
+
+    html = """
+    <html>
+        <body>
+            <address>
+                Kochi, Kerala, India
+            </address>
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    assert extract_address(
+        soup
+    ) == "Kochi, Kerala, India"
