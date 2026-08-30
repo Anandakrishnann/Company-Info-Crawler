@@ -240,3 +240,67 @@ def extract_social_profiles(
                 break
 
     return profiles
+
+
+def extract_page_data(
+    html: str,
+    url: str,
+    category: str,
+) -> dict:
+    """
+    Extract structured information from a single
+    crawled page.
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    data = {
+        "name": None,
+        "website": url,
+        "description": None,
+        "headquarters": None,
+        "locations": [],
+        "products": [],
+        "services": [],
+        "solutions": [],
+        "industries": [],
+        "emails": [],
+        "phones": [],
+        "address": None,
+        "contact_page": None,
+        "social_profiles": [],
+    }
+
+    # Common extraction.
+    title = extract_title(soup)
+
+    description = extract_description(
+        soup
+    )
+
+    emails = extract_emails(soup)
+
+    phones = extract_phones(soup)
+
+    social_profiles = extract_social_profiles(
+        soup,
+        url,
+    )
+
+    data["description"] = description
+    data["emails"] = emails
+    data["phones"] = phones
+    data["social_profiles"] = social_profiles
+
+    # Company name.
+    if title:
+        data["name"] = title
+
+    # Contact page.
+    if category == "contact":
+        data["contact_page"] = url
+
+    return data

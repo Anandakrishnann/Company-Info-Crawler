@@ -6,6 +6,7 @@ from app.extraction.extractor import (
     extract_phones,
     extract_social_profiles,
     extract_title,
+    extract_page_data,
 )
 
 
@@ -139,3 +140,28 @@ def test_extract_social_profiles():
 
     assert "linkedin" in platforms
     assert "facebook" in platforms
+    
+
+def test_extract_page_data():
+
+    data = extract_page_data(
+        HTML,
+        "https://abcindustries.com/contact",
+        "contact",
+    )
+
+    assert data["name"] == (
+        "ABC Industries"
+    )
+
+    assert data["description"] == (
+        "ABC Industries provides industrial automation solutions."
+    )
+
+    assert "info@abcindustries.com" in (
+        data["emails"]
+    )
+
+    assert data["contact_page"] == (
+        "https://abcindustries.com/contact"
+    )
