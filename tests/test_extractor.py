@@ -7,6 +7,7 @@ from app.extraction.extractor import (
     extract_social_profiles,
     extract_title,
     extract_page_data,
+    extract_company_name,
 )
 
 
@@ -165,3 +166,31 @@ def test_extract_page_data():
     assert data["contact_page"] == (
         "https://abcindustries.com/contact"
     )
+    
+    
+def test_extract_company_name_from_json_ld():
+
+    html = """
+    <html>
+        <head>
+            <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "ABC Industries"
+            }
+            </script>
+        </head>
+        <body>
+        </body>
+    </html>
+    """
+
+    soup = BeautifulSoup(
+        html,
+        "lxml",
+    )
+
+    assert extract_company_name(
+        soup
+    ) == "ABC Industries"

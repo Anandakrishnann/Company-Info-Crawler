@@ -1,3 +1,4 @@
+import json
 import re
 from urllib.parse import urljoin
 
@@ -44,6 +45,116 @@ def clean_text(text: str) -> str:
         text,
     ).strip()
 
+def extract_company_name(
+    soup: BeautifulSoup,
+) -> str | None:
+    """
+    Extract company name using several signals.
+
+    Priority:
+    1. JSON-LD Organization name
+    2. OpenGraph site name
+    3. Header/logo text
+    4. H1
+    """
+
+    # 1. JSON-LD structured data.
+    for script in soup.find_all(
+        "script",
+        type="application/ld+json",
+    ):
+        try:
+            data = json.loads(
+                script.string or script.get_text()
+            )
+        except (json.JSONDecodeError, TypeError):
+            continue
+
+        candidates = []
+
+        if isinstance(data, dict):
+            candidates.append(data)
+
+            graph = data.get("@graph")
+
+            if isinstance(graph, list):
+                candidates.extend(graph)
+
+        elif isinstance(data, list):
+            candidates.extend(data)
+
+        for item in candidates:
+
+            if not isinstance(item, dict):
+                continue
+
+            item_type = item.get("@type", "")
+
+            if isinstance(item_type, list):
+                is_org = any(
+                    "organization" in str(t).lower()
+                    for t in item_type
+                )
+            else:
+                is_org = (
+                    "organization"
+                    in str(item_type).lower()
+                )
+
+            if is_org and item.get("name"):
+                return clean_text(
+                    str(item["name"])
+                )
+
+    # 2. OpenGraph site name.
+    og_site = soup.find(
+        "meta",
+        property="og:site_name",
+    )
+
+    if og_site and og_site.get("content"):
+        return clean_text(
+            og_site["content"]
+        )
+
+    # 3. Header/logo text.
+    header = soup.find("header")
+
+    if header:
+
+        logo = header.find(
+            class_=re.compile(
+                r"logo|brand",
+                re.IGNORECASE,
+            )
+        )
+
+        if logo:
+            text = clean_text(
+                logo.get_text(
+                    " ",
+                    strip=True,
+                )
+            )
+
+            if text:
+                return text
+
+    # 4. H1.
+    h1 = soup.find("h1")
+
+    if h1:
+        text = clean_text(
+            h1.get_text(
+                " ",
+                strip=True,
+            )
+        )
+
+        if text:
+            return text
+
+    return None
 
 def extract_title(
     soup: BeautifulSoup,
