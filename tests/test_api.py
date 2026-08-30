@@ -210,3 +210,15 @@ def test_crawl_normalizes_homepage_url():
     assert data["pages"][0]["url"] == (
         "https://example.com/"
     )
+    
+    
+def test_crawl_rejects_invalid_url():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": "not-a-valid-url"
+        },
+    )
+
+    assert response.status_code == 422
