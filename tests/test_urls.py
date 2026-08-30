@@ -484,3 +484,48 @@ async def test_crawler_handles_failed_page():
     assert len(pages) == 1
 
     assert pages[0].processed is False
+    
+
+@pytest.mark.anyio
+async def test_crawler_processes_successful_page():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    html = """
+    <html>
+        <head>
+            <title>Example Company</title>
+        </head>
+        <body>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+        </body>
+    </html>
+    """
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/",
+                html,
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert stats.crawled == 1
+    assert stats.failed == 0
+    assert len(pages) == 1
+
+    assert pages[0].processed is True
+    assert pages[0].status_code == 200
+
+    assert pages[0].extraction_result[
+        "discovered_links"
+    ] == 2
