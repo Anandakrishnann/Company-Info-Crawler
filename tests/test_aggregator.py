@@ -255,3 +255,31 @@ def test_duplicate_list_value_keeps_multiple_sources():
         first_url,
         second_url,
     ]
+    
+
+
+def test_missing_scalar_does_not_overwrite_existing_value():
+
+    aggregator = CompanyAggregator()
+
+    aggregator.add_page_data(
+        {
+            "description": (
+                "ABC Industries is a manufacturer."
+            ),
+        },
+        "https://abcindustries.com/about",
+    )
+
+    aggregator.add_page_data(
+        {
+            "description": None,
+        },
+        "https://abcindustries.com/contact",
+    )
+
+    result = aggregator.result()
+
+    assert result["description"] == (
+        "ABC Industries is a manufacturer."
+    )
