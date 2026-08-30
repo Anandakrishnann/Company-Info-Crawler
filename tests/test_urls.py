@@ -529,3 +529,48 @@ async def test_crawler_processes_successful_page():
     assert pages[0].extraction_result[
         "discovered_links"
     ] == 2
+    
+    
+@pytest.mark.anyio
+async def test_crawler_returns_page_metadata():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    html = """
+    <html>
+        <head>
+            <title>ABC Industries</title>
+        </head>
+        <body>
+            <p>Industrial automation company.</p>
+        </body>
+    </html>
+    """
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                200,
+                "https://example.com/",
+                html,
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert len(pages) == 1
+    assert pages[0].url == (
+        "https://example.com/"
+    )
+
+    assert pages[0].status_code == 200
+    assert pages[0].processed is True
+
+    assert pages[0].extraction_result[
+        "html_length"
+    ] == len(html)
