@@ -222,3 +222,15 @@ def test_crawl_rejects_invalid_url():
     )
 
     assert response.status_code == 422
+    
+    
+def test_crawl_rejects_empty_url():
+
+    response = client.post(
+        "/crawl",
+        json={
+            "url": ""
+        },
+    )
+
+    assert response.status_code == 422
