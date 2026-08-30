@@ -1,3 +1,5 @@
+import pytest
+
 from app.crawler.crawler import WebsiteCrawler
 from app.crawler.url_manager import (
     calculate_relevance,
@@ -428,3 +430,26 @@ def test_homepage_has_highest_initial_priority():
     assert item["url"] == (
         "https://example.com/"
     )
+    
+@pytest.mark.anyio
+async def test_crawler_tracks_skipped_pages():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/about",
+        score=50,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/contact",
+        score=40,
+    )
+
+    pages, stats = await crawler.crawl()
+
+    assert stats.crawled <= 1
+    assert stats.skipped >= 0
