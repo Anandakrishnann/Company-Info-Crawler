@@ -58,12 +58,45 @@ class WebsiteCrawler:
     ):
         """
         Add a URL to the queue only if it hasn't
-        already been scheduled.
+        already been scheduled and appears to be
+        an HTML page.
         """
 
         normalized = normalize_url(url)
 
         if not normalized:
+            return
+
+        # Ignore non-HTML resources.
+        ignored_extensions = {
+            ".pdf",
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".webp",
+            ".svg",
+            ".zip",
+            ".rar",
+            ".7z",
+            ".mp3",
+            ".mp4",
+            ".avi",
+            ".mov",
+            ".doc",
+            ".docx",
+            ".xls",
+            ".xlsx",
+            ".ppt",
+            ".pptx",
+        }
+
+        path = urlparse(normalized).path.lower()
+
+        if any(
+            path.endswith(extension)
+            for extension in ignored_extensions
+        ):
             return
 
         if normalized in self.visited:
@@ -79,7 +112,6 @@ class WebsiteCrawler:
         )
 
         self.stats.discovered += 1
-
     def _get_next_url(self):
         """
         Return the highest-priority URL.

@@ -54,3 +54,40 @@ async def test_crawler_example_domain():
     assert stats.crawled >= 1
 
     assert len(pages) >= 1
+    
+
+def test_non_html_resources_are_not_added():
+
+    crawler = WebsiteCrawler(
+        "https://example.com"
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/company.pdf",
+        score=10,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/logo.png",
+        score=10,
+    )
+
+    crawler._add_to_queue(
+        "https://example.com/brochure.zip",
+        score=10,
+    )
+
+    assert (
+        "https://example.com/company.pdf"
+        not in crawler.visited
+    )
+
+    assert (
+        "https://example.com/logo.png"
+        not in crawler.visited
+    )
+
+    assert (
+        "https://example.com/brochure.zip"
+        not in crawler.visited
+    )
