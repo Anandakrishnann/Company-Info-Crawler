@@ -369,3 +369,39 @@ def test_extract_links_ignores_non_http_links():
         url.startswith("javascript:")
         for url in urls
     )
+    
+
+def test_extract_links_normalizes_tracking_parameters():
+
+    html = """
+    <html>
+        <body>
+
+            <a href="/about?utm_source=google">
+                About
+            </a>
+
+            <a href="/about">
+                About Company
+            </a>
+
+        </body>
+    </html>
+    """
+
+    links = extract_links(
+        html=html,
+        current_url="https://example.com/",
+        base_domain="example.com",
+    )
+
+    urls = [
+        link["url"]
+        for link in links
+    ]
+
+    assert (
+        urls.count(
+            "https://example.com/about"
+        ) == 1
+    )
