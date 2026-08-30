@@ -453,3 +453,34 @@ async def test_crawler_tracks_skipped_pages():
 
     assert stats.crawled <= 1
     assert stats.skipped >= 0
+    
+
+from unittest.mock import AsyncMock, patch
+
+
+@pytest.mark.anyio
+async def test_crawler_handles_failed_page():
+
+    crawler = WebsiteCrawler(
+        "https://example.com",
+        max_pages=1,
+    )
+
+    with patch(
+        "app.crawler.crawler.fetch_page",
+        new=AsyncMock(
+            return_value=(
+                500,
+                "https://example.com/",
+                "",
+            )
+        ),
+    ):
+
+        pages, stats = await crawler.crawl()
+
+    assert stats.failed == 1
+    assert stats.crawled == 0
+    assert len(pages) == 1
+
+    assert pages[0].processed is False
